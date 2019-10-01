@@ -5,88 +5,73 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Viewer"
         mc:Ignorable="d"
-        Title="Viewer" Height="450" Width="800">
-    
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="25"></RowDefinition>
+        Title="Viewer" 
+        WindowState="Maximized"
+        ResizeMode="CanResize">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
         </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.2*" MinWidth="160"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.2*" MinWidth="160"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
         <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">
             <StatusBar Height="25">
                 <StatusBarItem>
-                    <TextBlock Text="Тут будет путь до узла" Padding="2"/>
+                    <TextBlock Text="{Binding StringFormat=Путь до узла: {0}, 
+                        ElementName=ProtocolTreeView, 
+                          Path=SelectedValue}"
+                               Padding="2"/>
                 </StatusBarItem>
             </StatusBar>
         </Grid>
         <StackPanel Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" DockPanel.Dock="Left" Margin="0,0,0,-0.2">
-            <StackPanel Height="71" Margin="5">
+            <StackPanel Margin="5">
                 <TextBlock TextWrapping="Wrap" Text="Группировать по" Padding="2"/>
-                <RadioButton Content="Пользователю" Margin="5" IsChecked="True"/>
-                <RadioButton Content="Типу объекта"  Margin="5 0"/>
+                <RadioButton Content="Пользователю" Margin="5" IsChecked="True" Command="{Binding LoginToTopCommand}"/>
+                <RadioButton Content="Типу объекта"  Margin="5 0" Command="{Binding SmObjectToTopCommand}"/>
             </StackPanel>
-            <StackPanel Height="83" Margin="5">
+            <StackPanel Margin="5">
                 <TextBlock TextWrapping="Wrap" Text="Выбрать год" Padding="2"/>
-                <ComboBox IsEditable="True" Margin="5">
-                    <ComboBoxItem>Angus</ComboBoxItem>
-                    <ComboBoxItem>Jane</ComboBoxItem>
-                    <ComboBoxItem>Steve</ComboBoxItem>
+                <ComboBox IsEditable="True" Margin="5"
+                          ItemsSource="{Binding Path=Years}"
+                          SelectedItem="{Binding Path=SelectedYear, 
+                    Mode=TwoWay, 
+                    UpdateSourceTrigger=PropertyChanged}">
                 </ComboBox>
-            <Grid Margin="5 0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+                <Grid Margin="5 0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" Content="Применить" Margin="1"/>
-                <Button Grid.Column="1" Content="Сбросить" Margin="1"/>
-            </Grid>
-        </StackPanel>
-            <StackPanel Height="100" Margin="5">
+                    <Button Grid.Column="0" Content="Применить" Margin="1" Command="{Binding ConfirmYearCommand}"/>
+                    <Button Grid.Column="1" Content="Сбросить" Margin="1" Command="{Binding CancelYearCommand}"/>
+                </Grid>
+            </StackPanel>
+            <StackPanel Margin="5">
                 <TextBlock TextWrapping="Wrap" Text="Экспорт в Excel" Padding="2"/>
-                <Button Content="Экспортировать" Margin="5"/>
-
+                <Button Content="Экспортировать" Margin="5" Command="{Binding ExportCommand}"/>
             </StackPanel>
         </StackPanel>
-        <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Top">
-            <TreeView>
-                <TreeViewItem Header="Базы данных">
-                    <TreeViewItem Header="MS SQL Server">
-                        <TreeViewItem Header="2" />
-                        <TreeViewItem Header="3" />
-                        <TreeViewItem Header="4" />
-                    </TreeViewItem>
-                    <TreeViewItem Header="MySQL" />
-                    <TreeViewItem Header="MongoDB" />
-                    <TreeViewItem Header="Postgres" />
-                </TreeViewItem>
-                <TreeViewItem Header="Языки программирования">
-                    <TreeViewItem Header="C-языки">
-                        <TreeViewItem Header="C#" />
-                        <TreeViewItem Header="C/C++" />
-                        <TreeViewItem Header="Java" />
-                    </TreeViewItem>
-                    <TreeViewItem Header="Basic">
-                        <TreeViewItem Header="Visual Basic" />
-                        <TreeViewItem Header="VB.Net" />
-                        <TreeViewItem Header="PureBasic" />
-                    </TreeViewItem>
-                </TreeViewItem>
+        <Grid VerticalAlignment="Top" Grid.Column="1" Grid.Row="0">
+            <TreeView ItemsSource="{Binding Path = ProtocolNodes, 
+                UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                      x:Name="ProtocolTreeView"
+                      SelectedValuePath="NodePath">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Path = Nodes}">
+                        <TextBlock Text="{Binding Path=Name}" 
+                                   FontStyle="{Binding Path=NodeFontStyle}"
+                                   FontWeight="{Binding Path=NodeFontWeight}"/>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
             </TreeView>
-        </StackPanel>
-
-            <DataGrid>
-                <DataGrid.GroupStyle>
-                    <GroupStyle HeaderTemplate=""></GroupStyle>
-                </DataGrid.GroupStyle>
-            </DataGrid>
         </Grid>
-    
 
-
-
+    </Grid>
 </Window>
