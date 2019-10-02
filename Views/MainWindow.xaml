@@ -3,11 +3,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Viewer"
         mc:Ignorable="d"
         Title="Viewer" 
         WindowState="Maximized"
         ResizeMode="CanResize">
+
+    <Window.Resources>
+        <Style x:Key="HeaderTextBlock">
+            <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
+            <Setter Property="TextBlock.Padding" Value="2" />
+            <Setter Property="TextBlock.FontWeight" Value="SemiBold" />
+        </Style>
+    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -19,7 +26,8 @@
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">
+        <Grid Grid.Column="0" Grid.Row="1" 
+              Grid.ColumnSpan="2">
             <StatusBar Height="25">
                 <StatusBarItem>
                     <TextBlock Text="{Binding StringFormat=Путь до узла: {0}, 
@@ -29,19 +37,28 @@
                 </StatusBarItem>
             </StatusBar>
         </Grid>
-        <StackPanel Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" DockPanel.Dock="Left" Margin="0,0,0,-0.2">
+        <StackPanel Grid.Column="0" Grid.Row="0"
+                        Margin="0.5 0 0 0"
+                        Background="#f7f7f7">
             <StackPanel Margin="5">
-                <TextBlock TextWrapping="Wrap" Text="Группировать по" Padding="2"/>
+                <TextBlock Text="Группировать по" Style="{StaticResource HeaderTextBlock}"/>
                 <RadioButton Content="Пользователю" Margin="5" IsChecked="True" Command="{Binding LoginToTopCommand}"/>
                 <RadioButton Content="Типу объекта"  Margin="5 0" Command="{Binding SmObjectToTopCommand}"/>
             </StackPanel>
             <StackPanel Margin="5">
-                <TextBlock TextWrapping="Wrap" Text="Выбрать год" Padding="2"/>
+                <TextBlock Text="Выбрать год" Style="{StaticResource HeaderTextBlock}"/>
+                <TextBlock Text ="Выбранный год недоступен" Margin="7 2 0 0" 
+                           FontStyle="Italic" Foreground="IndianRed"
+                           Visibility="{Binding Path=IsYearExceptionVisibility}"
+                           FontSize="10">
+                </TextBlock>
                 <ComboBox IsEditable="True" Margin="5"
                           ItemsSource="{Binding Path=Years}"
-                          SelectedItem="{Binding Path=SelectedYear, 
+                          SelectedItem="{Binding Path=SelectedYear,                    
                     Mode=TwoWay, 
-                    UpdateSourceTrigger=PropertyChanged}">
+                    UpdateSourceTrigger=PropertyChanged}" 
+                          Text="{Binding Path=SelectedYearText}"
+                          MaxDropDownHeight="200">
                 </ComboBox>
                 <Grid Margin="5 0">
                     <Grid.ColumnDefinitions>
@@ -54,15 +71,19 @@
                 </Grid>
             </StackPanel>
             <StackPanel Margin="5">
-                <TextBlock TextWrapping="Wrap" Text="Экспорт в Excel" Padding="2"/>
+                <TextBlock Text="Экспорт в Excel" Style="{StaticResource HeaderTextBlock}"/>
                 <Button Content="Экспортировать" Margin="5" Command="{Binding ExportCommand}"/>
+                <TextBlock Text="{Binding Path=SelectedYearText}"></TextBlock>
             </StackPanel>
         </StackPanel>
-        <Grid VerticalAlignment="Top" Grid.Column="1" Grid.Row="0">
+
+        <Grid Grid.Column="1" Grid.Row="0">
             <TreeView ItemsSource="{Binding Path = ProtocolNodes, 
                 UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                       x:Name="ProtocolTreeView"
-                      SelectedValuePath="NodePath">
+                      SelectedValuePath="NodePath"
+                      BorderThickness="0.5"
+                      Margin="0 0 0.5 0">
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Path = Nodes}">
                         <TextBlock Text="{Binding Path=Name}" 
@@ -72,6 +93,5 @@
                 </TreeView.ItemTemplate>
             </TreeView>
         </Grid>
-
     </Grid>
 </Window>

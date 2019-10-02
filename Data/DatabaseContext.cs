@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data.Entity;
 
 namespace Viewer.Data
 {
@@ -13,6 +8,5 @@ namespace Viewer.Data
             base("ConnectionString") { }
         
         public DbSet<A0Protocol> A0Protocols { get; set; }
-
     }
 }

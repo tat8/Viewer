@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using Viewer.Models;
-
-namespace Viewer.Enums
+﻿namespace Viewer.Enums
 {
     public static class Enums
     {
+        /// <summary>
+        /// Type of the top node of the tree
+        /// </summary>
         public enum TopNodeType
         {
             Login,

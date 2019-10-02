@@ -1,17 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Viewer.Data;
 using Viewer.Models;
 using static Viewer.Enums.Enums.TopNodeType;
 
 namespace Viewer.Services
 {
+    /// <summary>
+    /// Groups data of 'A0Protocol' structure as the tree structure
+    /// </summary>
     public static class GroupService
     {
+        /// <summary>
+        /// Groups data from table 'A0Protocol' as a tree structure
+        /// </summary>
+        /// <param name="topNodeType"> type of top node </param>
+        /// <param name="year"> year to filter records </param>
+        /// <returns> structured data from 'A0Protocol' table as a tree </returns>
         public static ObservableCollection<Node> Group(Enums.Enums.TopNodeType topNodeType=Login, int? year = null)
         {
             switch (topNodeType)
@@ -26,12 +32,13 @@ namespace Viewer.Services
         }
 
         /// <summary>
-        /// Groups data with the structure 'Login'-'smObjectType'-'Operation'-'Date_Progect_ObjectId_LogText'
+        /// Groups data with the structure 'Login'-'SmObjectType'-'Operation'-'Date_Progect_ObjectId_LogText'
         /// </summary>
-        /// <returns> ObservableCollection of structured data</returns>
+        /// <param name="year"> year to filter data </param>
+        /// <returns> structured data as a tree </returns>
         private static ObservableCollection<Node> GroupByLogin(int? year = null)
         {
-            var protocols = DataService.GetProtocols(year);
+            var protocols = DataService.GetProtocols(year).ToList();
 
             // Get all possible logins
             var logins = protocols.GroupBy(o => o.Login)
@@ -47,7 +54,7 @@ namespace Viewer.Services
 
                 // Get all possible smObject's types for current login
                 var smObjectTypes = loginRecords.GroupBy(p => p.SmType)
-                    .Select(g => new { Type = g.Key, Name = Translator.GetInstance().GetObjectName(g.Key - 1) })
+                    .Select(g => new { Type = g.Key, Name = Convertor.GetInstance().GetObjectName(g.Key - 1) })
                     .OrderBy(s => s.Name);
 
                 var smObjectTypeNodes = new ObservableCollection<Node>();
@@ -80,13 +87,18 @@ namespace Viewer.Services
             return loginNodes;
         }
 
+        /// <summary>
+        /// Groups data with the structure 'SmObjectType'-'Login'-'Operation'-'Date_Progect_ObjectId_LogText'
+        /// </summary>
+        /// <param name="year"> year to filter data </param>
+        /// <returns> structured data as a tree </returns>
         private static ObservableCollection<Node> GroupBySmObjectType(int? year = null)
         {
-            var protocols = DataService.GetProtocols(year);
+            var protocols = DataService.GetProtocols(year).ToList();
 
             // Get all possible smObjectTypes
             var smObjectTypes = protocols.GroupBy(o => o.SmType)
-                .Select(p => new {Type = p.Key, Name = Translator.GetInstance().GetObjectName(p.Key - 1)})
+                .Select(p => new {Type = p.Key, Name = Convertor.GetInstance().GetObjectName(p.Key - 1)})
                 .OrderBy(s => s.Name);
 
             var smObjectTypesNodes = new ObservableCollection<Node>();
@@ -131,12 +143,19 @@ namespace Viewer.Services
             return smObjectTypesNodes;
         }
 
-
+        /// <summary>
+        /// Builds an inner part of the tree for A0Protocol structure: 'Operation'-'Date_Progect_ObjectId_LogText'
+        /// </summary>
+        /// <param name="protocol"> data to be structured </param>
+        /// <param name="login"> name of (grand)parent node 'Login' </param>
+        /// <param name="smObjectType"> name of (grand)parent node 'SmObjectType' </param>
+        /// <param name="topNodeType"> type of top node </param>
+        /// <returns> structured data as an inner part of a tree </returns>
         private static ObservableCollection<Node> GroupByOperation(List<A0Protocol> protocol, string login, string smObjectType, Enums.Enums.TopNodeType topNodeType)
         {
             // Get all possible operation's types for current login and current smObjectType
             var operationTypes = protocol.GroupBy(g => g.Oper)
-                .Select(u => new { Type = u.Key, Name = Translator.GetInstance().GetOperationName(u.Key - 1) })
+                .Select(u => new { Type = u.Key, Name = Convertor.GetInstance().GetOperationName(u.Key - 1) })
                 .OrderBy(s => s.Name);
 
             var operationNodes = new ObservableCollection<Node>();
@@ -147,8 +166,7 @@ namespace Viewer.Services
                 var operationRecords = protocol.Where(o => o.Oper == operationType.Type);
 
                 // Get all descriptions for current login, current smObjectType and current operationType
-                var descriptionItems = operationRecords.Select(o => new
-                        { EvDate = o.EvDate, ProjID = o.ProjID, SmObjID = o.SmObjID, LogText = o.LogText })
+                var descriptionItems = operationRecords.Select(o => new {o.EvDate, ProjID = o.ProjId, SmObjID = o.SmObjId, o.LogText })
                     .OrderBy(p => p.EvDate);
 
                 var descriptionNodes = new ObservableCollection<Node>();

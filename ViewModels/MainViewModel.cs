@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
+using System.Windows;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using Viewer.Commands;
 using Viewer.Models;
 using Viewer.Services;
@@ -26,6 +21,8 @@ namespace Viewer.ViewModels
         private RelayCommand _exportCommand;
         private ObservableCollection<int> _years;
         private int? _selectedYear;
+        private string _selectedYearText;
+        private Visibility _isYearExceptionVisibility;
         private int? _confirmedSelectedYear;
         private Enums.Enums.TopNodeType _topNodeType;
 
@@ -35,7 +32,7 @@ namespace Viewer.ViewModels
             set
             {
                 _protocolNodes = value;
-                OnPropertyChanged("ProtocolNodes");
+                OnPropertyChanged();
             }
         }
 
@@ -45,7 +42,7 @@ namespace Viewer.ViewModels
             set
             {
                 _years = value;
-                OnPropertyChanged("Years");
+                OnPropertyChanged();
             }
         }
 
@@ -55,7 +52,40 @@ namespace Viewer.ViewModels
             set
             {
                 _selectedYear = value;
-                OnPropertyChanged("SelectedYear");
+                if (_selectedYear == null && (_selectedYearText != null || _selectedYearText != ""))
+                {
+                    SelectedYearText = "";
+                    IsYearExceptionVisibility = Visibility.Visible;
+                }
+                else
+                {
+                    IsYearExceptionVisibility = Visibility.Collapsed;
+                }
+                OnPropertyChanged();
+            }
+        }
+
+        public string SelectedYearText
+        {
+            get => _selectedYearText;
+            set
+            {
+                _selectedYearText = value;
+                if (string.IsNullOrEmpty(_selectedYearText))
+                {
+                    IsYearExceptionVisibility = Visibility.Collapsed;
+                }
+                OnPropertyChanged();
+            }
+        }
+
+        public Visibility IsYearExceptionVisibility
+        {
+            get => _isYearExceptionVisibility;
+            set
+            {
+                _isYearExceptionVisibility = value;
+                OnPropertyChanged();
             }
         }
 
@@ -92,7 +122,12 @@ namespace Viewer.ViewModels
                 return _confirmYearCommand ??
                        (_confirmYearCommand = new RelayCommand(obj =>
                        {
-                           _confirmedSelectedYear = SelectedYear; 
+                           if (IsYearExceptionVisibility == Visibility.Visible)
+                           {
+                               return;
+                           }
+                           _confirmedSelectedYear = SelectedYear;
+                           SelectedYearText = SelectedYear.ToString();
                            GetProtocolNodes();
                        }));
             }
@@ -105,6 +140,7 @@ namespace Viewer.ViewModels
                 return _cancelYearCommand ?? (_cancelYearCommand = new RelayCommand(obj =>
                 {
                     SelectedYear = null;
+                    SelectedYearText = null;
                     _confirmedSelectedYear = null;
                     GetProtocolNodes();
                 }));
@@ -117,8 +153,12 @@ namespace Viewer.ViewModels
             {
                 return _exportCommand ?? (_exportCommand = new RelayCommand(obj =>
                 {
-                    var filepath = $@"F:\test\Protocol{DateTime.Now:yyyy_MM_dd_HH_mm_ss}.xlsx";
-                    ExportService.Export(filepath, ProtocolNodes);
+                    var dialog = new CommonOpenFileDialog { IsFolderPicker = true };
+                    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                    {
+                        var filepath = $@"{dialog.FileName}\Protocol{DateTime.Now:yyyy_MM_dd_HH_mm_ss}.xlsx";
+                        ExportService.Export(filepath, ProtocolNodes);
+                    }
                 }));
             }
         }
@@ -127,6 +167,7 @@ namespace Viewer.ViewModels
         {
             GetProtocolNodes();
             Years = DataService.GetAllYears();
+            IsYearExceptionVisibility = Visibility.Collapsed;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

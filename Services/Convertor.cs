@@ -1,36 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Viewer.Services
 {
-    public class Translator
+    /// <summary>
+    /// Converts fields of 'A0Protocol' table which are specified with a code to their string value
+    /// </summary>
+    public class Convertor
     {
-        private static Translator _instance;
+        private static Convertor _instance;
         private static Dictionary<int, string> _operationTypeDictionary;
         private static Dictionary<int, string> _objectTypeDictionary;
 
-        private Translator()
+        private Convertor()
         {
             CreateObjectTypes();
             CreateOperationTypes();
         }
 
-        public static Translator GetInstance()
+        public static Convertor GetInstance()
         {
-            if (_instance == null)
-            {
-                _instance = new Translator();
-            }
-
-            return _instance;
+            return _instance ?? (_instance = new Convertor());
         }
         
         /// <summary>
-        /// Get name of operation type by type
+        /// Get string value of 'Oper'
         /// </summary>
         /// <param name="type"> operation's type </param>
-        /// <returns> name of operation </returns>
+        /// <returns> name of an operation </returns>
         public string GetOperationName(int type)
         {
             string result;
@@ -47,6 +44,11 @@ namespace Viewer.Services
             return result;
         }
 
+        /// <summary>
+        /// Get string value of 'SmType'
+        /// </summary>
+        /// <param name="type"> smObject's type </param>
+        /// <returns> name of a smObjects </returns>
         public string GetObjectName(int type)
         {
             string result;

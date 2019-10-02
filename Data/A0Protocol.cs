@@ -13,8 +13,8 @@ namespace Viewer.Data
         public string Login { get; set; }
 
         public int Oper { get; set; }
-        public int ProjID { get; set; }
-        public int SmObjID { get; set; }
+        public int ProjId { get; set; }
+        public int SmObjId { get; set; }
         public int SmType { get; set; }
         public string LogText { get; set; }
     }

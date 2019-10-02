@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using Viewer.Services;
 
@@ -22,7 +17,7 @@ namespace Viewer.Models
 
         public Node()
         {
-            NodeStyle = StyleGetter.GetDefault();
+            NodeStyle = StyleGetter.Get();
         }
 
         public string Name
@@ -31,7 +26,7 @@ namespace Viewer.Models
             set
             {
                 _name = value;
-                OnPropertyChanged("Name");
+                OnPropertyChanged();
             }
         }
 
@@ -41,7 +36,7 @@ namespace Viewer.Models
             set
             {
                 _nodePath = value;
-                OnPropertyChanged("NodePath");
+                OnPropertyChanged();
             }
         }
 
@@ -51,7 +46,7 @@ namespace Viewer.Models
             set
             {
                 _nodes = value; 
-                OnPropertyChanged("Nodes");
+                OnPropertyChanged();
             }
         }
 
@@ -62,7 +57,7 @@ namespace Viewer.Models
                 _nodeStyle = value;
                 NodeFontStyle = _nodeStyle.FontStyle;
                 NodeFontWeight = _nodeStyle.FontWeight;
-                OnPropertyChanged("NodeStyle");
+                OnPropertyChanged();
             }
         }
 
@@ -72,7 +67,7 @@ namespace Viewer.Models
             private set
             {
                 _nodeFontStyle = value;
-                OnPropertyChanged("NodeFontStyle");
+                OnPropertyChanged();
             }
         }
 
@@ -82,7 +77,7 @@ namespace Viewer.Models
             private set
             {
                 _nodeFontWeight = value;
-                OnPropertyChanged("NodeFontWeight");
+                OnPropertyChanged();
             }
         }
 
