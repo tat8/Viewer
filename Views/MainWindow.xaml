@@ -73,7 +73,6 @@
             <StackPanel Margin="5">
                 <TextBlock Text="Экспорт в Excel" Style="{StaticResource HeaderTextBlock}"/>
                 <Button Content="Экспортировать" Margin="5" Command="{Binding ExportCommand}"/>
-                <TextBlock Text="{Binding Path=SelectedYearText}"></TextBlock>
             </StackPanel>
         </StackPanel>
 
