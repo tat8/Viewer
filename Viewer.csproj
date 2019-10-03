@@ -18,7 +18,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>F:\c#\test\Publish7\</PublishUrl>
+    <PublishUrl>F:\c#\test\Publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -28,7 +28,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>9</ApplicationRevision>
+    <ApplicationRevision>10</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -121,7 +121,7 @@
     <Compile Include="Commands\RelayCommand.cs" />
     <Compile Include="Data\A0Protocol.cs" />
     <Compile Include="Data\DatabaseContext.cs" />
-    <Compile Include="Enums\Enums.cs" />
+    <Compile Include="Enums\TreeEnums.cs" />
     <Compile Include="Models\DescriptionNode.cs" />
     <Compile Include="Models\Node.cs" />
     <Compile Include="Models\NodeStyle.cs" />

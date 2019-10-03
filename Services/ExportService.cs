@@ -41,6 +41,7 @@ namespace Viewer.Services
             CreateWorksheet();
             FillCells(nodes);
             CloseExcel(path);
+            _recordsCount = 0;
         }
 
         private static void GetExcelObject()

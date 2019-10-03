@@ -17,80 +17,96 @@
     </Window.Resources>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="25"></RowDefinition>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.2*" MinWidth="160"></ColumnDefinition>
-            <ColumnDefinition Width="*"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="25"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.2*" MinWidth="160"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0" Grid.Row="1" 
+            <Grid Grid.Column="0" Grid.Row="1" 
               Grid.ColumnSpan="2">
-            <StatusBar Height="25">
-                <StatusBarItem>
-                    <TextBlock Text="{Binding StringFormat=Путь до узла: {0}, 
+                <StatusBar Height="25">
+                    <StatusBarItem>
+                        <TextBlock Text="{Binding StringFormat=Путь до узла: {0}, 
                         ElementName=ProtocolTreeView, 
                           Path=SelectedValue}"
                                Padding="2"/>
-                </StatusBarItem>
-            </StatusBar>
-        </Grid>
-        <StackPanel Grid.Column="0" Grid.Row="0"
+                    </StatusBarItem>
+                </StatusBar>
+            </Grid>
+            <StackPanel Grid.Column="0" Grid.Row="0"
                         Margin="0.5 0 0 0"
                         Background="#f7f7f7">
-            <StackPanel Margin="5">
-                <TextBlock Text="Группировать по" Style="{StaticResource HeaderTextBlock}"/>
-                <RadioButton Content="Пользователю" Margin="5" IsChecked="True" Command="{Binding LoginToTopCommand}"/>
-                <RadioButton Content="Типу объекта"  Margin="5 0" Command="{Binding SmObjectToTopCommand}"/>
-            </StackPanel>
-            <StackPanel Margin="5">
-                <TextBlock Text="Выбрать год" Style="{StaticResource HeaderTextBlock}"/>
-                <TextBlock Text ="Выбранный год недоступен" Margin="7 2 0 0" 
+                <StackPanel Margin="5">
+                    <TextBlock Text="Группировать по" Style="{StaticResource HeaderTextBlock}"/>
+                    <RadioButton Content="Пользователю" Margin="5" IsChecked="True" Command="{Binding LoginToTopCommand}"/>
+                    <RadioButton Content="Типу объекта"  Margin="5 0" Command="{Binding SmObjectToTopCommand}"/>
+                </StackPanel>
+                <StackPanel Margin="5">
+                    <TextBlock Text="Выбрать год" Style="{StaticResource HeaderTextBlock}"/>
+                    <TextBlock Text ="Выбранный год недоступен" Margin="7 2 0 0" 
                            FontStyle="Italic" Foreground="IndianRed"
                            Visibility="{Binding Path=IsYearExceptionVisibility}"
                            FontSize="10">
-                </TextBlock>
-                <ComboBox IsEditable="True" Margin="5"
+                    </TextBlock>
+                    <ComboBox IsEditable="True" Margin="5"
                           ItemsSource="{Binding Path=Years}"
                           SelectedItem="{Binding Path=SelectedYear,                    
-                    Mode=TwoWay, 
-                    UpdateSourceTrigger=PropertyChanged}" 
-                          Text="{Binding Path=SelectedYearText}"
-                          MaxDropDownHeight="200">
-                </ComboBox>
-                <Grid Margin="5 0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                        Mode=TwoWay, 
+                        UpdateSourceTrigger=PropertyChanged}" 
+                              Text="{Binding Path=SelectedYearText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                              MaxDropDownHeight="200"
+                          Loaded="YearCombobox_OnLoaded">
+                    </ComboBox>
+                    <Grid Margin="5 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                    <Button Grid.Column="0" Content="Применить" Margin="1" Command="{Binding ConfirmYearCommand}"/>
-                    <Button Grid.Column="1" Content="Сбросить" Margin="1" Command="{Binding CancelYearCommand}"/>
-                </Grid>
+                        <Button Grid.Column="0" Content="Применить" Margin="1" Command="{Binding ConfirmYearCommand}"/>
+                        <Button Grid.Column="1" Content="Сбросить" Margin="1" Command="{Binding CancelYearCommand}"/>
+                    </Grid>
+                </StackPanel>
+                <StackPanel Margin="5">
+                    <TextBlock Text="Экспорт в Excel" Style="{StaticResource HeaderTextBlock}"/>
+                    <Button Content="Экспортировать" Margin="5" Command="{Binding ExportCommand}"/>
+                </StackPanel>
             </StackPanel>
-            <StackPanel Margin="5">
-                <TextBlock Text="Экспорт в Excel" Style="{StaticResource HeaderTextBlock}"/>
-                <Button Content="Экспортировать" Margin="5" Command="{Binding ExportCommand}"/>
-            </StackPanel>
-        </StackPanel>
 
-        <Grid Grid.Column="1" Grid.Row="0">
-            <TreeView ItemsSource="{Binding Path = ProtocolNodes, 
+            <Grid Grid.Column="1" Grid.Row="0">
+                <TreeView ItemsSource="{Binding Path = ProtocolNodes, 
                 UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                       x:Name="ProtocolTreeView"
                       SelectedValuePath="NodePath"
                       BorderThickness="0.5"
                       Margin="0 0 0.5 0">
-                <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Path = Nodes}">
-                        <TextBlock Text="{Binding Path=Name}" 
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Path = Nodes}">
+                            <TextBlock Text="{Binding Path=Name}" 
                                    FontStyle="{Binding Path=NodeFontStyle}"
                                    FontWeight="{Binding Path=NodeFontWeight}"/>
-                    </HierarchicalDataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </Grid>
         </Grid>
+
+        <Grid Background="LightGray"
+                     Opacity="0.5"
+                     Visibility="{Binding Path=IsWaitingVisibility, 
+            UpdateSourceTrigger=PropertyChanged}">
+        </Grid>
+        <Grid Visibility="{Binding Path=IsWaitingVisibility, UpdateSourceTrigger=PropertyChanged}">
+            <TextBlock Text="Пожалуйста, подождите, выполняется экспорт данных..."
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"></TextBlock>
+        </Grid>
+
     </Grid>
+
 </Window>

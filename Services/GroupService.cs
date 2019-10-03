@@ -2,8 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using Viewer.Data;
+using Viewer.Enums.TreeEnums;
 using Viewer.Models;
-using static Viewer.Enums.Enums.TopNodeType;
 
 namespace Viewer.Services
 {
@@ -15,16 +15,16 @@ namespace Viewer.Services
         /// <summary>
         /// Groups data from table 'A0Protocol' as a tree structure
         /// </summary>
-        /// <param name="topNodeType"> type of top node </param>
+        /// <param name="topNodeEnum"> type of top node </param>
         /// <param name="year"> year to filter records </param>
         /// <returns> structured data from 'A0Protocol' table as a tree </returns>
-        public static ObservableCollection<Node> Group(Enums.Enums.TopNodeType topNodeType=Login, int? year = null)
+        public static ObservableCollection<Node> Group(TopNodeEnum topNodeEnum=TopNodeEnum.Login, int? year = null)
         {
-            switch (topNodeType)
+            switch (topNodeEnum)
             {
-                case Login:
+                case TopNodeEnum.Login:
                     return GroupByLogin(year);
-                case SmObjectType:
+                case TopNodeEnum.SmObjectType:
                     return GroupBySmObjectType(year);
                 default:
                     return GroupByLogin(year);
@@ -65,7 +65,7 @@ namespace Viewer.Services
                     var smObjectRecords = loginRecords.Where(o => o.SmType == smObjectType.Type).ToList();
                     
                     // Get subtree for operations and descriptions for current login and currtn smObjectType
-                    var operationNodes = GroupByOperation(smObjectRecords, login.Name, smObjectType.Name,Login);
+                    var operationNodes = GroupByOperation(smObjectRecords, login.Name, smObjectType.Name, TopNodeEnum.Login);
 
                     smObjectTypeNodes.Add(new Node
                     {
@@ -121,7 +121,7 @@ namespace Viewer.Services
                     var loginRecords = smObjectRecords.Where(o => o.Login == login.Name).ToList();
 
                     // Get subtree for operations and descriptions for current login and currtn smObjectType
-                    var operationNodes = GroupByOperation(loginRecords, login.Name, smObjectType.Name, SmObjectType);
+                    var operationNodes = GroupByOperation(loginRecords, login.Name, smObjectType.Name, TopNodeEnum.SmObjectType);
 
                     loginNodes.Add(new Node
                     {
@@ -149,9 +149,9 @@ namespace Viewer.Services
         /// <param name="protocol"> data to be structured </param>
         /// <param name="login"> name of (grand)parent node 'Login' </param>
         /// <param name="smObjectType"> name of (grand)parent node 'SmObjectType' </param>
-        /// <param name="topNodeType"> type of top node </param>
+        /// <param name="topNodeEnum"> type of top node </param>
         /// <returns> structured data as an inner part of a tree </returns>
-        private static ObservableCollection<Node> GroupByOperation(List<A0Protocol> protocol, string login, string smObjectType, Enums.Enums.TopNodeType topNodeType)
+        private static ObservableCollection<Node> GroupByOperation(List<A0Protocol> protocol, string login, string smObjectType, TopNodeEnum topNodeEnum)
         {
             // Get all possible operation's types for current login and current smObjectType
             var operationTypes = protocol.GroupBy(g => g.Oper)
@@ -177,12 +177,12 @@ namespace Viewer.Services
                         descriptionItem.SmObjID, descriptionItem.LogText);
 
                     // Create path according which node is the first
-                    switch (topNodeType)
+                    switch (topNodeEnum)
                     {
-                        case Login:
+                        case TopNodeEnum.Login:
                             descriptionNode.NodePath = $"{login}/{smObjectType}/{operationType.Name}";
                             break;
-                        case SmObjectType:
+                        case TopNodeEnum.SmObjectType:
                             descriptionNode.NodePath = $"{smObjectType}/{login}/{operationType.Name}";
                             break;
                         default:
@@ -203,12 +203,12 @@ namespace Viewer.Services
                 };
 
                 // Create path according which node is the first
-                switch (topNodeType)
+                switch (topNodeEnum)
                 {
-                    case Login:
+                    case TopNodeEnum.Login:
                         operationNode.NodePath = $"{login}/{smObjectType}";
                         break;
-                    case SmObjectType:
+                    case TopNodeEnum.SmObjectType:
                         operationNode.NodePath = $"{smObjectType}/{login}";
                         break;
                     default:

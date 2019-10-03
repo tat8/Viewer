@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using Viewer.ViewModels;
 
 namespace Viewer.Views
@@ -12,6 +13,16 @@ namespace Viewer.Views
         {
             InitializeComponent();
             DataContext = new MainViewModel();
+        }
+
+        public void YearCombobox_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            var obj = (ComboBox)sender;
+            var myTextBox = (TextBox)obj?.Template.FindName("PART_EditableTextBox", obj);
+            if (myTextBox != null)
+            {
+                myTextBox.MaxLength = 4;
+            }
         }
     }
 }

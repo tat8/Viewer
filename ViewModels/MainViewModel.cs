@@ -5,9 +5,10 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Viewer.Commands;
+using Viewer.Enums.TreeEnums;
 using Viewer.Models;
 using Viewer.Services;
-using static Viewer.Enums.Enums.TopNodeType;
+
 
 namespace Viewer.ViewModels
 {
@@ -24,7 +25,8 @@ namespace Viewer.ViewModels
         private string _selectedYearText;
         private Visibility _isYearExceptionVisibility;
         private int? _confirmedSelectedYear;
-        private Enums.Enums.TopNodeType _topNodeType;
+        private TopNodeEnum _topNodeEnum;
+        private Visibility _isWaitingVisibility;
 
         public ObservableCollection<Node> ProtocolNodes
         {
@@ -52,15 +54,7 @@ namespace Viewer.ViewModels
             set
             {
                 _selectedYear = value;
-                if (_selectedYear == null && (_selectedYearText != null || _selectedYearText != ""))
-                {
-                    SelectedYearText = "";
-                    IsYearExceptionVisibility = Visibility.Visible;
-                }
-                else
-                {
-                    IsYearExceptionVisibility = Visibility.Collapsed;
-                }
+                IsYearExceptionVisibility = Visibility.Collapsed;
                 OnPropertyChanged();
             }
         }
@@ -71,10 +65,12 @@ namespace Viewer.ViewModels
             set
             {
                 _selectedYearText = value;
+
                 if (string.IsNullOrEmpty(_selectedYearText))
                 {
                     IsYearExceptionVisibility = Visibility.Collapsed;
                 }
+
                 OnPropertyChanged();
             }
         }
@@ -89,6 +85,16 @@ namespace Viewer.ViewModels
             }
         }
 
+        public Visibility IsWaitingVisibility
+        {
+            get => _isWaitingVisibility;
+            set
+            {
+                _isWaitingVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
         public RelayCommand LoginToTopCommand
         {
             get
@@ -96,7 +102,7 @@ namespace Viewer.ViewModels
                 return _loginToTopCommand ??
                        (_loginToTopCommand = new RelayCommand(obj =>
                        {
-                           _topNodeType = Login;
+                           _topNodeEnum = TopNodeEnum.Login;
                            GetProtocolNodes();
                        }));
             }
@@ -109,7 +115,7 @@ namespace Viewer.ViewModels
                 return _smObjectToTopCommand ??
                        (_smObjectToTopCommand = new RelayCommand(obj =>
                        {
-                           _topNodeType = SmObjectType;
+                           _topNodeEnum = TopNodeEnum.SmObjectType;
                            GetProtocolNodes();
                        }));
             }
@@ -126,9 +132,26 @@ namespace Viewer.ViewModels
                            {
                                return;
                            }
-                           _confirmedSelectedYear = SelectedYear;
-                           SelectedYearText = SelectedYear.ToString();
-                           GetProtocolNodes();
+
+                           int? year;
+                           try
+                           {
+                               year = Convert.ToInt32(SelectedYearText);
+                           }
+                           catch (FormatException)
+                           {
+                               year = null;
+                           }
+
+                           if (string.IsNullOrEmpty(SelectedYearText) || year != null && Years.Contains((int)year))
+                           {
+                               _confirmedSelectedYear = SelectedYear;
+                               GetProtocolNodes();
+                           }
+                           else
+                           {
+                               IsYearExceptionVisibility = Visibility.Visible;
+                           }
                        }));
             }
         }
@@ -153,12 +176,14 @@ namespace Viewer.ViewModels
             {
                 return _exportCommand ?? (_exportCommand = new RelayCommand(obj =>
                 {
+                    IsWaitingVisibility = Visibility.Visible;
                     var dialog = new CommonOpenFileDialog { IsFolderPicker = true };
                     if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                     {
                         var filepath = $@"{dialog.FileName}\Protocol{DateTime.Now:yyyy_MM_dd_HH_mm_ss}.xlsx";
                         ExportService.Export(filepath, ProtocolNodes);
                     }
+                    IsWaitingVisibility = Visibility.Hidden;
                 }));
             }
         }
@@ -168,6 +193,7 @@ namespace Viewer.ViewModels
             GetProtocolNodes();
             Years = DataService.GetAllYears();
             IsYearExceptionVisibility = Visibility.Collapsed;
+            IsWaitingVisibility = Visibility.Hidden;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -179,7 +205,7 @@ namespace Viewer.ViewModels
 
         private void GetProtocolNodes()
         {
-            ProtocolNodes = GroupService.Group(_topNodeType, _confirmedSelectedYear);
+            ProtocolNodes = GroupService.Group(_topNodeEnum, _confirmedSelectedYear);
         }
     }
 }
